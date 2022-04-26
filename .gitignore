@@ -1,0 +1,9 @@
+/target
+*.db-wal
+*.db-shm
+*.db
+*.*.sql
+.env
+blog.db
+.DS_Store
+.vscode
