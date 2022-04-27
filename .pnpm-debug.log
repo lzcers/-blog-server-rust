@@ -1,0 +1,14 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND",
+    "err": {
+      "name": "pnpm",
+      "message": "No package.json (or package.yaml, or package.json5) was found in \"/Users/zack/code/blog-server\".",
+      "code": "ERR_PNPM_NO_IMPORTER_MANIFEST_FOUND",
+      "stack": "pnpm: No package.json (or package.yaml, or package.json5) was found in \"/Users/zack/code/blog-server\".\n    at readProjectManifest (/Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:19808:13)\n    at async Object.readProjectManifestOnly (/Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:19812:28)\n    at async readProjectManifestOnly (/Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:43691:24)\n    at async Object.handler (/Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:177805:24)\n    at async /Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:182068:21\n    at async run (/Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:182042:34)\n    at async runPnpm (/Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:182261:5)\n    at async /Users/zack/pnpm-global/5/node_modules/.pnpm/pnpm@6.30.1/node_modules/pnpm/dist/pnpm.cjs:182253:7"
+    }
+  }
+}

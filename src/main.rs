@@ -13,8 +13,8 @@ async fn main() {
     dotenv().ok();
     tracing_subscriber::fmt::init();
 
-    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let addr = SocketAddr::from(([0, 0, 0, 0], 443));
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let blog_db = db::BlogDB::new(&db_url).await.expect("connect blog faild!");
     tracing::debug!("listening on {}", addr);
 
