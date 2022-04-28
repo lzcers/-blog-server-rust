@@ -3,7 +3,6 @@ use axum::{
     Extension, Router,
 };
 use dotenv::dotenv;
-use http::{HeaderValue, Method};
 use std::{env, net::SocketAddr};
 use tower_http::cors::{Any, CorsLayer};
 mod db;

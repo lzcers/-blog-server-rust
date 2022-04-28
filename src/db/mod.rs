@@ -1,4 +1,4 @@
-use chrono::{Local, TimeZone, Utc};
+use chrono::{DateTime, Local, TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{sqlite::SqlitePool, Pool, Sqlite};
 
@@ -13,6 +13,14 @@ pub struct Note {
 #[derive(Clone)]
 pub struct BlogDB {
     pool: Pool<Sqlite>,
+}
+
+fn local_dt_to_utc(dt: &str) -> DateTime<Utc> {
+    if let Ok(local_c) = Local::datetime_from_str(&Local, &dt, "%Y/%m/%d %H:%M:%S") {
+        DateTime::<Utc>::from_utc(local_c.naive_utc(), Utc)
+    } else {
+        Utc::now()
+    }
 }
 
 impl BlogDB {
@@ -43,16 +51,38 @@ impl BlogDB {
         Ok(results)
     }
 
-    pub async fn add_note(self, content: String) -> anyhow::Result<Note> {
-        let id = sqlx::query!(
-            r#"
-                INSERT INTO notes ( content ) VALUES ( ?1 )
-            "#,
-            content
-        )
-        .execute(&self.pool)
-        .await?
-        .last_insert_rowid();
+    pub async fn add_note(
+        self,
+        content: String,
+        created_at: Option<String>,
+        updated_at: Option<String>,
+    ) -> anyhow::Result<Note> {
+        let id = match (created_at, updated_at) {
+            (Some(c_at), Some(u_at)) => {
+                let utc_created_at = local_dt_to_utc(&c_at);
+                let utc_updated_at = local_dt_to_utc(&u_at);
+                sqlx::query!(
+                    r#"
+                        INSERT INTO notes ( content, created_at, updated_at ) VALUES ( ?1, ?2, ?3 )
+                    "#,
+                    content,
+                    utc_created_at,
+                    utc_updated_at
+                )
+                .execute(&self.pool)
+                .await?
+                .last_insert_rowid()
+            }
+            _ => sqlx::query!(
+                r#"
+                    INSERT INTO notes ( content ) VALUES ( ?1 )
+                "#,
+                content
+            )
+            .execute(&self.pool)
+            .await?
+            .last_insert_rowid(),
+        };
         let row = sqlx::query!(
             r#"
                 SELECT * FROM notes WHERE id = ?
