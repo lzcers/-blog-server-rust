@@ -8,3 +8,4 @@ blog.db
 .DS_Store
 .vscode
 /ssl
+*.log
