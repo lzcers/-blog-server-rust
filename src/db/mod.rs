@@ -33,7 +33,7 @@ impl BlogDB {
         let results = sqlx::query!(
             r#"
                 SELECT id, content, created_at, updated_at
-                FROM notes
+                FROM notes ORDER BY created_at DESC;
             "#
         )
         .map(|row| Note {
