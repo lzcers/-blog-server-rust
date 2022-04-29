@@ -3,9 +3,12 @@ use axum::{
     middleware::Next,
     response::IntoResponse,
 };
+use dotenv::dotenv;
 use std::env;
 
 pub async fn auth<ReqBody>(req: Request<ReqBody>, next: Next<ReqBody>) -> impl IntoResponse {
+    dotenv().ok();
+
     let token = req
         .headers()
         .get("token")

@@ -1,4 +1,4 @@
-POST http://127.0.0.1:4443/add_note HTTP/1.1
+POST https://127.0.0.1:4443/add_note HTTP/1.1
 content-type: application/json
 
 {
@@ -29,4 +29,19 @@ token: 2.718281e
 {
     "id": 1
 }
+
+
+### 线上接口测试
+POST https://api.ksana.net/add_note HTTP/1.1
+content-type: application/json
+
+{
+    "content": "hello world",
+    "created_at": "2022/4/29 00:59:00",
+    "updated_at": "2022/4/29 00:59:00"
+}
+
+### 线上接口测试
+GET https://api.ksana.net/get_all_notes HTTP/1.1
+content-type: application/json
 
