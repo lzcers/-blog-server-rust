@@ -1,6 +1,5 @@
 use crate::db::{BlogDB, Note};
 use axum::{http::StatusCode, Extension, Json};
-use http::HeaderMap;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -22,23 +21,14 @@ pub struct DeleteNote {
 }
 
 pub async fn add_note(
-    headers: HeaderMap,
     Json(payload): Json<AddNote>,
     Extension(blog_db): Extension<BlogDB>,
 ) -> Result<(StatusCode, Json<Note>), (StatusCode, String)> {
-    if let Some(token) = headers.get("token") {
-        if token == "3.1415926pi" {
-            let note = blog_db
-                .add_note(payload.content, payload.created_at, payload.updated_at)
-                .await
-                .expect("blog connecting faild!");
-            Ok((StatusCode::OK, Json(note)))
-        } else {
-            Err((StatusCode::UNAUTHORIZED, "token 错误".to_owned()))
-        }
-    } else {
-        Err((StatusCode::UNAUTHORIZED, "未授权".to_owned()))
-    }
+    let note = blog_db
+        .add_note(payload.content, payload.created_at, payload.updated_at)
+        .await
+        .expect("blog connecting faild!");
+    Ok((StatusCode::OK, Json(note)))
 }
 
 pub async fn delete_note(

@@ -10,7 +10,7 @@ content-type: application/json
 ###
 POST http://127.0.0.1:4443/add_note HTTP/1.1
 content-type: application/json
-token: 3.1415926pi
+token: 2.718281e
 
 {
     "content": "hello world token test"
@@ -20,3 +20,13 @@ token: 3.1415926pi
 ###
 get http://127.0.0.1:4443/get_all_notes HTTP/1.1
 content-type: application/json
+
+###
+POST http://127.0.0.1:4443/delete_note HTTP/1.1
+content-type: application/json
+token: 2.718281e
+
+{
+    "id": 1
+}
+
