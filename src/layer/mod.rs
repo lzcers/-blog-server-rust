@@ -1,27 +1,24 @@
+use crate::db;
 use axum::{
     http::{Request, StatusCode},
     middleware::Next,
     response::IntoResponse,
 };
-use dotenv::dotenv;
-use std::env;
 
 pub async fn auth<ReqBody>(req: Request<ReqBody>, next: Next<ReqBody>) -> impl IntoResponse {
-    dotenv().ok();
-
     let token = req
         .headers()
         .get("token")
         .and_then(|header| header.to_str().ok());
 
-    // 先把 token 存本地环境变量里
-    let secret = env::var("TOKEN").expect("token is not found!");
+    if let (Some(db), Some(tk)) = (req.extensions().get::<db::notes::NotesDB>(), token) {
+        let auth_result = db.auth_token(tk).await.expect("token check faild");
 
-    if let Some(tk) = token {
-        if tk == &secret {
+        if auth_result == true {
             return Ok(next.run(req).await);
+        } else {
+            return Err((StatusCode::UNAUTHORIZED, "token is incorrect".to_owned()));
         }
-        return Err((StatusCode::UNAUTHORIZED, "token is incorrect".to_owned()));
     } else {
         return Err((StatusCode::UNAUTHORIZED, "token is not setting".to_owned()));
     }
