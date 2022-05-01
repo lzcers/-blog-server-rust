@@ -53,33 +53,62 @@ impl NotesDB {
         }
     }
 
-    pub async fn get_notes(&self, page_number: i32, page_size: i32) -> anyhow::Result<NotesPage> {
+    pub async fn get_notes(
+        &self,
+        page_number: i32,
+        page_size: i32,
+        is_editor: bool,
+    ) -> anyhow::Result<NotesPage> {
         let offset = page_size * (page_number - 1);
         let total = sqlx::query!("SELECT COUNT(*) AS count FROM notes")
             .fetch_one(&self.pool)
             .await?
             .count;
 
-        let results = sqlx::query!(
-            r#"
-                SELECT id, content, created_at, updated_at
-                FROM notes ORDER BY created_at DESC LIMIT ?1 OFFSET ?2;
-            "#,
-            page_size,
-            offset
-        )
-        .map(|row| Note {
-            id: row.id,
-            content: row.content.expect(""),
-            updated_at: Local::from_utc_datetime(&Local, &row.updated_at)
-                .format("%Y/%m/%d %H:%M:%S")
-                .to_string(),
-            created_at: Local::from_utc_datetime(&Local, &row.created_at)
-                .format("%Y/%m/%d %H:%M:%S")
-                .to_string(),
-        })
-        .fetch_all(&self.pool)
-        .await?;
+        let results = if is_editor {
+            sqlx::query!(
+                r#"
+                    SELECT id, content, created_at, updated_at
+                    FROM notes ORDER BY created_at DESC LIMIT ?1 OFFSET ?2;
+                "#,
+                page_size,
+                offset
+            )
+            .map(|row| Note {
+                id: row.id,
+                content: row.content.expect(""),
+                updated_at: Local::from_utc_datetime(&Local, &row.updated_at)
+                    .format("%Y/%m/%d %H:%M:%S")
+                    .to_string(),
+                created_at: Local::from_utc_datetime(&Local, &row.created_at)
+                    .format("%Y/%m/%d %H:%M:%S")
+                    .to_string(),
+            })
+            .fetch_all(&self.pool)
+            .await?
+        } else {
+            sqlx::query!(
+                r#"
+                    SELECT id, content, created_at, updated_at
+                    FROM notes WHERE content NOT LIKE "%#密"||x'0a'||"%"
+                    ORDER BY created_at DESC LIMIT ?1 OFFSET ?2;
+                "#,
+                page_size,
+                offset
+            )
+            .map(|row| Note {
+                id: row.id,
+                content: row.content.expect(""),
+                updated_at: Local::from_utc_datetime(&Local, &row.updated_at)
+                    .format("%Y/%m/%d %H:%M:%S")
+                    .to_string(),
+                created_at: Local::from_utc_datetime(&Local, &row.created_at)
+                    .format("%Y/%m/%d %H:%M:%S")
+                    .to_string(),
+            })
+            .fetch_all(&self.pool)
+            .await?
+        };
 
         Ok(NotesPage {
             page_number,

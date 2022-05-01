@@ -83,11 +83,23 @@ pub async fn auth_token(
 }
 
 pub async fn get_notes(
+    headers: HeaderMap,
     Json(payload): Json<GetNotes>,
     Extension(blog_db): Extension<NotesDB>,
 ) -> Result<(StatusCode, Json<NotesPage>), String> {
+    let mut is_editor = false;
+    if let Some(token) = headers.get("token").and_then(|header| header.to_str().ok()) {
+        if true
+            == blog_db
+                .auth_token(token)
+                .await
+                .expect("get notes auth faild!")
+        {
+            is_editor = true;
+        }
+    }
     let notes = blog_db
-        .get_notes(payload.page_number, payload.page_size)
+        .get_notes(payload.page_number, payload.page_size, is_editor)
         .await
         .expect("get all note faild!");
     Ok((StatusCode::OK, Json(notes)))
