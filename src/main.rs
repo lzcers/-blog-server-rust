@@ -8,9 +8,10 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
+use http::{request::Parts as RequestParts, HeaderValue};
 use services::notes;
 use std::{env, net::SocketAddr};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::{AllowOrigin, Any, CorsLayer};
 
 #[tokio::main]
 async fn main() {
@@ -25,7 +26,12 @@ async fn main() {
     tracing::debug!("listening on {}", addr);
 
     let cors = CorsLayer::new()
-        .allow_origin(Any)
+        .allow_origin(AllowOrigin::predicate(
+            |origin: &HeaderValue, _request_parts: &RequestParts| {
+                origin.as_bytes().ends_with(b"ksana.net")
+                    || origin.as_bytes().ends_with(b"localhost:3000")
+            },
+        ))
         .allow_methods(Any)
         .allow_headers(Any);
 
